@@ -13,7 +13,15 @@ const createCard = (req, res) => {
     .catch((err) => res.status(500).send({ message: err.message }));
 };
 
+const deleteCard = (req, res) => {
+  const { id } = req.params;
+  Card.findByIdAndDelete(id)
+    .then(() => res.status(200).send('Карточка успешно удалена'))
+    .catch((err) => res.status(500).send({ message: err.message }));
+};
+
 module.exports = {
   getCards,
   createCard,
+  deleteCard,
 };
