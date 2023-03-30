@@ -27,7 +27,7 @@ const likeCard = (req, res) => {
     { new: true },
   )
     .then(() => res.status(200).send('Лайк успешно поставлен'))
-    .catch((err) => res.status(400).send({ err: err.message }));
+    .catch((err) => res.status(400).send({ message: err.message }));
 };
 
 const dislikeCard = (req, res) => {
@@ -37,7 +37,7 @@ const dislikeCard = (req, res) => {
     { new: true },
   )
     .then(() => res.status(200).send('Лайк успешно убран'))
-    .catch((err) => res.status(400).send({ err: err.message }));
+    .catch((err) => res.status(400).send({ message: err.message }));
 };
 
 module.exports = {
