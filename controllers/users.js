@@ -2,6 +2,8 @@ const User = require('../models/user');
 
 const SUCCEES_CODE = 200;
 const SUCCEES_CREATE = 201;
+const ERROR_NOTDATAS = 400;
+const ERROR_NOTFOUND = 404;
 const ERROR_SERVER = 500;
 
 const getUsers = (req, res) => {
@@ -14,15 +16,29 @@ const getUserById = (req, res) => {
   const { id } = req.params;
 
   User.findById(id)
-    .then((users) => res.status(SUCCEES_CODE).send({ data: users }))
+    .then((user) => {
+      if (user) {
+        res.status(SUCCEES_CODE).send({ data: user });
+      } else {
+        res.status(ERROR_NOTFOUND).send({ message: 'Запрашиваемого пользователя не существует' });
+      }
+    })
     .catch((err) => res.status(ERROR_SERVER).send({ message: err.message }));
 };
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
-  User.create({ name, about, avatar })
-    .then((user) => res.status(SUCCEES_CREATE).send({ data: user }))
+  User.create({ name, about, avatar }, {
+    runValidators: true,
+  })
+    .then((user) => {
+      if (user) {
+        res.status(SUCCEES_CREATE).send({ data: user });
+      } else {
+        res.status(ERROR_NOTDATAS).send({ message: 'Переданы некорректные данные' });
+      }
+    })
     .catch((err) => res.status(ERROR_SERVER).send({ message: err.message }));
 };
 
@@ -33,7 +49,13 @@ const updateUserInfo = (req, res) => {
     new: true,
     runValidators: true,
   })
-    .then((user) => res.status(SUCCEES_CODE).send(user))
+    .then((user) => {
+      if (user) {
+        res.status(SUCCEES_CODE).send(user);
+      } else {
+        res.status(ERROR_NOTDATAS).send({ message: 'Переданы некорректные данные' });
+      }
+    })
     .catch((err) => res.status(ERROR_SERVER).send({ message: err.message }));
 };
 
@@ -44,7 +66,13 @@ const updateUserAvatar = (req, res) => {
     new: true,
     runValidators: true,
   })
-    .then((user) => res.status(SUCCEES_CODE).send(user))
+    .then((user) => {
+      if (user) {
+        res.status(SUCCEES_CODE).send(user);
+      } else {
+        res.status(ERROR_NOTDATAS).send({ message: 'Переданы некорректные данные' });
+      }
+    })
     .catch((err) => res.status(ERROR_SERVER).send({ message: err.message }));
 };
 
