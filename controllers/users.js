@@ -1,15 +1,9 @@
 const User = require('../models/user');
 
-const SUCCEES_CODE = 200;
-const SUCCEES_CREATE = 201;
-const ERROR_NOTDATAS = 400;
-const ERROR_NOTFOUND = 404;
-const ERROR_SERVER = 500;
-
 const getUsers = (req, res) => {
   User.find({})
-    .then((users) => res.status(SUCCEES_CODE).send({ data: users }))
-    .catch((err) => res.status(ERROR_SERVER).send({ message: err.message }));
+    .then((users) => res.status(200).send({ data: users }))
+    .catch((err) => res.status(500).send({ message: err.message }));
 };
 
 const getUserById = (req, res) => {
@@ -18,28 +12,26 @@ const getUserById = (req, res) => {
   User.findById(id)
     .then((user) => {
       if (user) {
-        res.status(SUCCEES_CODE).send({ data: user });
+        res.status(200).send({ data: user });
       } else {
-        res.status(ERROR_NOTFOUND).send({ message: 'Запрашиваемого пользователя не существует' });
+        res.status(404).send({ message: 'Запрашиваемого пользователя не существует' });
       }
     })
-    .catch((err) => res.status(ERROR_SERVER).send({ message: err.message }));
+    .catch((err) => res.status(500).send({ message: err.message }));
 };
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
-  User.create({ name, about, avatar }, {
-    runValidators: true,
-  })
+  User.create({ name, about, avatar })
     .then((user) => {
       if (user) {
-        res.status(SUCCEES_CREATE).send({ data: user });
+        res.status(201).send({ data: user });
       } else {
-        res.status(ERROR_NOTDATAS).send({ message: 'Переданы некорректные данные' });
+        res.status(400).send({ message: 'Переданы некорректные данные' });
       }
     })
-    .catch((err) => res.status(ERROR_SERVER).send({ message: err.message }));
+    .catch((err) => res.status(500).send({ message: err.message }));
 };
 
 const updateUserInfo = (req, res) => {
@@ -51,12 +43,12 @@ const updateUserInfo = (req, res) => {
   })
     .then((user) => {
       if (user) {
-        res.status(SUCCEES_CODE).send(user);
+        res.status(200).send(user);
       } else {
-        res.status(ERROR_NOTDATAS).send({ message: 'Переданы некорректные данные' });
+        res.status(400).send({ message: 'Переданы некорректные данные' });
       }
     })
-    .catch((err) => res.status(ERROR_SERVER).send({ message: err.message }));
+    .catch((err) => res.status(500).send({ message: err.message }));
 };
 
 const updateUserAvatar = (req, res) => {
@@ -68,12 +60,12 @@ const updateUserAvatar = (req, res) => {
   })
     .then((user) => {
       if (user) {
-        res.status(SUCCEES_CODE).send(user);
+        res.status(200).send(user);
       } else {
-        res.status(ERROR_NOTDATAS).send({ message: 'Переданы некорректные данные' });
+        res.status(400).send({ message: 'Переданы некорректные данные' });
       }
     })
-    .catch((err) => res.status(ERROR_SERVER).send({ message: err.message }));
+    .catch((err) => res.status(500).send({ message: err.message }));
 };
 
 module.exports = {
