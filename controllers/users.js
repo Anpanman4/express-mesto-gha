@@ -13,11 +13,11 @@ const getUserById = (req, res) => {
 
   User.findById(id, { name: 1, about: 1, avatar: 1 })
     .then((user) => {
-      if (user) res.status(200).send(user);
+      if (user) return res.status(200).send(user);
+      return res.status(ERROR_DATA).send({ message: 'Пользователь по ID не найден' });
     })
-    .catch((err) => {
-      if (err.name === 'CastError') return res.status(ERROR_DATA).send({ message: 'Пользователь по ID не найден' });
-      return res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });
+    .catch(() => {
+      res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });
     });
 };
 
