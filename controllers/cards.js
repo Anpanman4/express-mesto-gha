@@ -1,6 +1,6 @@
 const Card = require('../models/card');
 
-const { ERROR_DATA, ERROR_ID, ERROR_DEFAULT } = require('../utils/utils');
+const { ERROR_DATA, ERROR_DEFAULT } = require('../utils/utils');
 
 const getCards = (req, res) => {
   Card.find({})
@@ -14,12 +14,9 @@ const getCards = (req, res) => {
 const createCard = (req, res) => {
   const { name, link } = req.body;
 
-  if (name === undefined || link === undefined) return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-
-  return Card.create({ name, link, owner: req.user._id })
+  Card.create({ name, link, owner: req.user._id })
     .then((card) => {
-      if (card) return res.status(201).send(card);
-      return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
+      if (card) res.status(201).send(card);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные при создании пользователя.' });
@@ -32,11 +29,10 @@ const deleteCard = (req, res) => {
 
   Card.findByIdAndDelete(id)
     .then((card) => {
-      if (card) return res.status(200).send(card);
-      return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
+      if (card) res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === 'CastError') return res.status(ERROR_ID).send({ message: 'Запрашиваемого пользователя не существует' });
+      if (err.name === 'CastError') return res.status(ERROR_DATA).send({ message: 'Запрашиваемого пользователя не существует' });
       return res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });
     });
 };
@@ -48,12 +44,11 @@ const likeCard = (req, res) => {
     { new: true },
   )
     .then((card) => {
-      if (card) return res.status(200).send(card);
-      return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
+      if (card) res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-      if (err.name === 'CastError') return res.status(ERROR_ID).send({ message: 'Запрашиваемого пользователя не существует' });
+      if (`${err.message.split(' ')[14].slice(1, -1)}` === 'BSONError') return res.status(ERROR_DATA).send({ message: 'Пользователя с таким ID не существует' });
+      if (err.name === 'CastError') return res.status(ERROR_DATA).send({ message: 'Карточки с таким ID не существует' });
       return res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });
     });
 };
@@ -65,12 +60,11 @@ const dislikeCard = (req, res) => {
     { new: true },
   )
     .then((card) => {
-      if (card) return res.status(200).send(card);
-      return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
+      if (card) res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-      if (err.name === 'CastError') return res.status(ERROR_ID).send({ message: 'Запрашиваемого пользователя не существует' });
+      if (`${err.message.split(' ')[14].slice(1, -1)}` === 'BSONError') return res.status(ERROR_DATA).send({ message: 'Пользователя с таким ID не существует' });
+      if (err.name === 'CastError') return res.status(ERROR_DATA).send({ message: 'Карточки с таким ID не существует' });
       return res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });
     });
 };

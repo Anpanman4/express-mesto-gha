@@ -1,6 +1,6 @@
 const User = require('../models/user');
 
-const { ERROR_DATA, ERROR_ID, ERROR_DEFAULT } = require('../utils/utils');
+const { ERROR_DATA, ERROR_DEFAULT } = require('../utils/utils');
 
 const getUsers = (req, res) => {
   User.find({})
@@ -13,11 +13,10 @@ const getUserById = (req, res) => {
 
   User.findById(id, { name: 1, about: 1, avatar: 1 })
     .then((user) => {
-      if (user) return res.status(200).send(user);
-      return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
+      if (user) res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === 'CastError') return res.status(ERROR_ID).send({ message: 'Запрашиваемого пользователя не существует' });
+      if (err.name === 'CastError') return res.status(ERROR_DATA).send({ message: 'Пользователь по ID не найден' });
       return res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });
     });
 };
@@ -27,8 +26,7 @@ const createUser = (req, res) => {
 
   User.create({ name, about, avatar })
     .then((user) => {
-      if (user) return res.status(201).send(user);
-      return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
+      if (user) res.status(201).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные при создании пользователя.' });
@@ -44,12 +42,10 @@ const updateUserInfo = (req, res) => {
     runValidators: true,
   })
     .then((user) => {
-      if (user) return res.status(200).send(user);
-      return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
+      if (user) res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-      if (err.name === 'CastError') return res.status(ERROR_ID).send({ message: 'Запрашиваемого пользователя не существует' });
       return res.status(ERROR_DEFAULT).send({ message: err.message });
     });
 };
@@ -62,12 +58,10 @@ const updateUserAvatar = (req, res) => {
     runValidators: true,
   })
     .then((user) => {
-      if (user) return res.status(200).send(user);
-      return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
+      if (user) res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-      if (err.name === 'CastError') return res.status(ERROR_ID).send({ message: 'Запрашиваемого пользователя не существует' });
       return res.status(ERROR_DEFAULT).send({ message: err.message });
     });
 };
