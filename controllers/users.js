@@ -1,15 +1,9 @@
 const User = require('../models/user');
 
-const SUCCEES_CODE = 200;
-const SUCCEES_CREATE = 201;
-const ERROR_NOTDATAS = 400;
-const ERROR_NOTFOUND = 404;
-const ERROR_SERVER = 500;
-
 const getUsers = (req, res) => {
   User.find({})
-    .then((users) => res.status(SUCCEES_CODE).send({ data: users }))
-    .catch((err) => res.status(ERROR_SERVER).send({ message: err.message }));
+    .then((users) => res.status(200).send({ data: users }))
+    .catch(() => res.status(500).send({ message: 'Что-то пошло не так' }));
 };
 
 const getUserById = (req, res) => {
@@ -17,29 +11,27 @@ const getUserById = (req, res) => {
 
   User.findById(id)
     .then((user) => {
-      if (user) {
-        res.status(SUCCEES_CODE).send({ data: user });
-      } else {
-        res.status(ERROR_NOTFOUND).send({ message: 'Запрашиваемого пользователя не существует' });
-      }
+      if (user) return res.status(200).send(user);
+      return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
     })
-    .catch((err) => res.status(ERROR_SERVER).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === 'CastError') return res.status(404).send({ message: 'Запрашиваемого пользователя не существует' });
+      return res.status(500).send({ message: 'Что-то пошло не так' });
+    });
 };
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
-  User.create({ name, about, avatar }, {
-    runValidators: true,
-  })
+  User.create({ name, about, avatar })
     .then((user) => {
-      if (user) {
-        res.status(SUCCEES_CREATE).send({ data: user });
-      } else {
-        res.status(ERROR_NOTDATAS).send({ message: 'Переданы некорректные данные' });
-      }
+      if (user) return res.status(201).send(user);
+      return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
     })
-    .catch((err) => res.status(ERROR_SERVER).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      return res.status(500).send({ message: 'Что-то пошло не так' });
+    });
 };
 
 const updateUserInfo = (req, res) => {
@@ -50,13 +42,14 @@ const updateUserInfo = (req, res) => {
     runValidators: true,
   })
     .then((user) => {
-      if (user) {
-        res.status(SUCCEES_CODE).send(user);
-      } else {
-        res.status(ERROR_NOTDATAS).send({ message: 'Переданы некорректные данные' });
-      }
+      if (user) return res.status(200).send(user);
+      return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
     })
-    .catch((err) => res.status(ERROR_SERVER).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      if (err.name === 'CastError') return res.status(404).send({ message: 'Запрашиваемого пользователя не существует' });
+      return res.status(500).send({ message: err.message });
+    });
 };
 
 const updateUserAvatar = (req, res) => {
@@ -67,13 +60,14 @@ const updateUserAvatar = (req, res) => {
     runValidators: true,
   })
     .then((user) => {
-      if (user) {
-        res.status(SUCCEES_CODE).send(user);
-      } else {
-        res.status(ERROR_NOTDATAS).send({ message: 'Переданы некорректные данные' });
-      }
+      if (user) return res.status(200).send(user);
+      return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
     })
-    .catch((err) => res.status(ERROR_SERVER).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      if (err.name === 'CastError') return res.status(404).send({ message: 'Запрашиваемого пользователя не существует' });
+      return res.status(500).send({ message: err.message });
+    });
 };
 
 module.exports = {
