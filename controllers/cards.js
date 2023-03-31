@@ -2,7 +2,7 @@ const Card = require('../models/card');
 
 const getCards = (req, res) => {
   Card.find({})
-    .populate('user')
+    .populate('owner')
     .then((cards) => res.status(200).send(cards))
     .catch(() => {
       res.status(500).send({ message: 'Что-то пошло не так' });
@@ -12,7 +12,9 @@ const getCards = (req, res) => {
 const createCard = (req, res) => {
   const { name, link } = req.body;
 
-  Card.create({ name, link, owner: req.user._id })
+  if (name === undefined || link === undefined) return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+
+  return Card.create({ name, link, owner: req.user._id })
     .then((card) => {
       if (card) return res.status(201).send(card);
       return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
