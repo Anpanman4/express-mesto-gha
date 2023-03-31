@@ -4,7 +4,9 @@ const getCards = (req, res) => {
   Card.find({})
     .populate('user')
     .then((cards) => res.status(200).send(cards))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch(() => {
+      res.status(500).send({ message: 'Что-то пошло не так' });
+    });
 };
 
 const createCard = (req, res) => {
@@ -12,13 +14,13 @@ const createCard = (req, res) => {
 
   Card.create({ name, link, owner: req.user._id })
     .then((card) => {
-      if (card) {
-        res.status(201).send(card);
-      } else {
-        res.status(400).send({ message: 'Ошибка валидации запроса' });
-      }
+      if (card) return res.status(201).send(card);
+      return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
     })
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      return res.status(500).send({ message: 'Что-то пошло не так' });
+    });
 };
 
 const deleteCard = (req, res) => {
@@ -26,13 +28,13 @@ const deleteCard = (req, res) => {
 
   Card.findByIdAndDelete(id)
     .then((card) => {
-      if (card) {
-        res.status(200).send(card);
-      } else {
-        res.status(404).send({ message: 'Запрашиваемая карточка не найдена' });
-      }
+      if (card) return res.status(200).send(card);
+      return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
     })
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === 'CastError') return res.status(404).send({ message: 'Запрашиваемого пользователя не существует' });
+      return res.status(500).send({ message: 'Что-то пошло не так' });
+    });
 };
 
 const likeCard = (req, res) => {
@@ -42,13 +44,14 @@ const likeCard = (req, res) => {
     { new: true },
   )
     .then((card) => {
-      if (card) {
-        res.status(200).send(card);
-      } else {
-        res.status(404).send({ message: 'Данной карточки не существует' });
-      }
+      if (card) return res.status(200).send(card);
+      return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
     })
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      if (err.name === 'CastError') return res.status(404).send({ message: 'Запрашиваемого пользователя не существует' });
+      return res.status(500).send({ message: 'Что-то пошло не так' });
+    });
 };
 
 const dislikeCard = (req, res) => {
@@ -58,13 +61,14 @@ const dislikeCard = (req, res) => {
     { new: true },
   )
     .then((card) => {
-      if (card) {
-        res.status(200).send(card);
-      } else {
-        res.status(404).send({ message: 'Данной карточки не существует' });
-      }
+      if (card) return res.status(200).send(card);
+      return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
     })
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      if (err.name === 'CastError') return res.status(404).send({ message: 'Запрашиваемого пользователя не существует' });
+      return res.status(500).send({ message: 'Что-то пошло не так' });
+    });
 };
 
 module.exports = {
