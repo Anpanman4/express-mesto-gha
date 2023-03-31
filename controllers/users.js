@@ -1,6 +1,6 @@
 const User = require('../models/user');
 
-const { ERROR_DATA, ERROR_DEFAULT } = require('../utils/utils');
+const { ERROR_DATA, ERROR_ID, ERROR_DEFAULT } = require('../utils/utils');
 
 const getUsers = (req, res) => {
   User.find({})
@@ -14,7 +14,7 @@ const getUserById = (req, res) => {
   User.findById(id, { name: 1, about: 1, avatar: 1 })
     .then((user) => {
       if (user) return res.status(200).send(user);
-      return res.status(ERROR_DATA).send({ message: 'Пользователь по ID не найден' });
+      return res.status(ERROR_ID).send({ message: 'Пользователь по ID не найден' });
     })
     .catch(() => {
       res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });

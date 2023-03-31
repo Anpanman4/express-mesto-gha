@@ -1,6 +1,6 @@
 const Card = require('../models/card');
 
-const { ERROR_DATA, ERROR_DEFAULT } = require('../utils/utils');
+const { ERROR_DATA, ERROR_ID, ERROR_DEFAULT } = require('../utils/utils');
 
 const getCards = (req, res) => {
   Card.find({})
@@ -44,7 +44,8 @@ const likeCard = (req, res) => {
     { new: true },
   )
     .then((card) => {
-      if (card) res.status(200).send(card);
+      if (card) return res.status(200).send(card);
+      return res.status(ERROR_ID).send({ message: 'Карточка по ID не найдена' });
     })
     .catch((err) => {
       if (`${err.message.split(' ')[14].slice(1, -1)}` === 'BSONError') return res.status(ERROR_DATA).send({ message: 'Пользователя с таким ID не существует' });
@@ -60,7 +61,8 @@ const dislikeCard = (req, res) => {
     { new: true },
   )
     .then((card) => {
-      if (card) res.status(200).send(card);
+      if (card) return res.status(200).send(card);
+      return res.status(ERROR_ID).send({ message: 'Карточка по ID не найдена' });
     })
     .catch((err) => {
       if (`${err.message.split(' ')[14].slice(1, -1)}` === 'BSONError') return res.status(ERROR_DATA).send({ message: 'Пользователя с таким ID не существует' });
