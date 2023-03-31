@@ -1,22 +1,24 @@
 const User = require('../models/user');
 
+const { ERROR_DATA, ERROR_ID, ERROR_DEFAULT } = require('../utils/utils');
+
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(200).send({ data: users }))
-    .catch(() => res.status(500).send({ message: 'Что-то пошло не так' }));
+    .catch(() => res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' }));
 };
 
 const getUserById = (req, res) => {
   const { id } = req.params;
 
-  User.findById(id)
+  User.findById(id, { name: 1, about: 1, avatar: 1 })
     .then((user) => {
       if (user) return res.status(200).send(user);
       return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
     })
     .catch((err) => {
-      if (err.name === 'CastError') return res.status(404).send({ message: 'Запрашиваемого пользователя не существует' });
-      return res.status(500).send({ message: 'Что-то пошло не так' });
+      if (err.name === 'CastError') return res.status(ERROR_ID).send({ message: 'Запрашиваемого пользователя не существует' });
+      return res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });
     });
 };
 
@@ -29,8 +31,8 @@ const createUser = (req, res) => {
       return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-      return res.status(500).send({ message: 'Что-то пошло не так' });
+      if (err.name === 'ValidationError') return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      return res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });
     });
 };
 
@@ -46,9 +48,9 @@ const updateUserInfo = (req, res) => {
       return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-      if (err.name === 'CastError') return res.status(404).send({ message: 'Запрашиваемого пользователя не существует' });
-      return res.status(500).send({ message: err.message });
+      if (err.name === 'ValidationError') return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      if (err.name === 'CastError') return res.status(ERROR_ID).send({ message: 'Запрашиваемого пользователя не существует' });
+      return res.status(ERROR_DEFAULT).send({ message: err.message });
     });
 };
 
@@ -64,9 +66,9 @@ const updateUserAvatar = (req, res) => {
       return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-      if (err.name === 'CastError') return res.status(404).send({ message: 'Запрашиваемого пользователя не существует' });
-      return res.status(500).send({ message: err.message });
+      if (err.name === 'ValidationError') return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      if (err.name === 'CastError') return res.status(ERROR_ID).send({ message: 'Запрашиваемого пользователя не существует' });
+      return res.status(ERROR_DEFAULT).send({ message: err.message });
     });
 };
 

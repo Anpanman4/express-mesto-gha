@@ -1,18 +1,20 @@
 const Card = require('../models/card');
 
+const { ERROR_DATA, ERROR_ID, ERROR_DEFAULT } = require('../utils/utils');
+
 const getCards = (req, res) => {
   Card.find({})
-    .populate('owner')
+    .populate(['owner', 'likes'])
     .then((cards) => res.status(200).send(cards))
     .catch(() => {
-      res.status(500).send({ message: 'Что-то пошло не так' });
+      res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });
     });
 };
 
 const createCard = (req, res) => {
   const { name, link } = req.body;
 
-  if (name === undefined || link === undefined) return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+  if (name === undefined || link === undefined) return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные при создании пользователя.' });
 
   return Card.create({ name, link, owner: req.user._id })
     .then((card) => {
@@ -20,8 +22,8 @@ const createCard = (req, res) => {
       return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-      return res.status(500).send({ message: 'Что-то пошло не так' });
+      if (err.name === 'ValidationError') return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      return res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });
     });
 };
 
@@ -34,8 +36,8 @@ const deleteCard = (req, res) => {
       return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
     })
     .catch((err) => {
-      if (err.name === 'CastError') return res.status(404).send({ message: 'Запрашиваемого пользователя не существует' });
-      return res.status(500).send({ message: 'Что-то пошло не так' });
+      if (err.name === 'CastError') return res.status(ERROR_ID).send({ message: 'Запрашиваемого пользователя не существует' });
+      return res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });
     });
 };
 
@@ -50,9 +52,9 @@ const likeCard = (req, res) => {
       return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-      if (err.name === 'CastError') return res.status(404).send({ message: 'Запрашиваемого пользователя не существует' });
-      return res.status(500).send({ message: 'Что-то пошло не так' });
+      if (err.name === 'ValidationError') return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      if (err.name === 'CastError') return res.status(ERROR_ID).send({ message: 'Запрашиваемого пользователя не существует' });
+      return res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });
     });
 };
 
@@ -67,9 +69,9 @@ const dislikeCard = (req, res) => {
       return Promise.reject(new Error('Ошибка. Что-то пошло не так...'));
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-      if (err.name === 'CastError') return res.status(404).send({ message: 'Запрашиваемого пользователя не существует' });
-      return res.status(500).send({ message: 'Что-то пошло не так' });
+      if (err.name === 'ValidationError') return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      if (err.name === 'CastError') return res.status(ERROR_ID).send({ message: 'Запрашиваемого пользователя не существует' });
+      return res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });
     });
 };
 
