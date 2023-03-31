@@ -29,7 +29,8 @@ const deleteCard = (req, res) => {
 
   Card.findByIdAndDelete(id)
     .then((card) => {
-      if (card) res.status(200).send(card);
+      if (card) return res.status(200).send(card);
+      return res.status(ERROR_ID).send({ message: 'Карточка по ID не найдена' });
     })
     .catch((err) => {
       if (err.name === 'CastError') return res.status(ERROR_DATA).send({ message: 'Запрашиваемого пользователя не существует' });
