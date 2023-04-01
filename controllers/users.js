@@ -16,8 +16,9 @@ const getUserById = (req, res) => {
       if (user) return res.status(200).send(user);
       return res.status(ERROR_ID).send({ message: 'Пользователь по ID не найден' });
     })
-    .catch(() => {
-      res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });
+    .catch((err) => {
+      if (err.name === 'CastError') return res.status(ERROR_DATA).send({ message: 'Что-то пошло не так' });
+      return res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });
     });
 };
 
@@ -45,7 +46,7 @@ const updateUserInfo = (req, res) => {
       if (user) res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      if (err.name === 'ValidationError') return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные для обновления информации.' });
       return res.status(ERROR_DEFAULT).send({ message: err.message });
     });
 };
@@ -61,7 +62,7 @@ const updateUserAvatar = (req, res) => {
       if (user) res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      if (err.name === 'ValidationError') return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные для обновления аватара.' });
       return res.status(ERROR_DEFAULT).send({ message: err.message });
     });
 };

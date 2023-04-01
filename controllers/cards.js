@@ -49,8 +49,7 @@ const likeCard = (req, res) => {
       return res.status(ERROR_ID).send({ message: 'Карточка по ID не найдена' });
     })
     .catch((err) => {
-      if (`${err.message.split(' ')[14].slice(1, -1)}` === 'BSONError') return res.status(ERROR_DATA).send({ message: 'Пользователя с таким ID не существует' });
-      if (err.name === 'CastError') return res.status(ERROR_DATA).send({ message: 'Карточки с таким ID не существует' });
+      if (err.name === 'CastError') return res.status(ERROR_DATA).send({ message: 'Передан невалидный ID' });
       return res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });
     });
 };
@@ -66,8 +65,7 @@ const dislikeCard = (req, res) => {
       return res.status(ERROR_ID).send({ message: 'Карточка по ID не найдена' });
     })
     .catch((err) => {
-      if (`${err.message.split(' ')[14].slice(1, -1)}` === 'BSONError') return res.status(ERROR_DATA).send({ message: 'Пользователя с таким ID не существует' });
-      if (err.name === 'CastError') return res.status(ERROR_DATA).send({ message: 'Карточки с таким ID не существует' });
+      if (err.name === 'CastError') return res.status(ERROR_DATA).send({ message: 'Передан невалидный ID' });
       return res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });
     });
 };
