@@ -1,8 +1,11 @@
-const { hash } = require('bcrypt');
+const { hash, compare } = require('bcrypt');
+const jsonwebtoken = require('jsonwebtoken');
 
 const User = require('../models/user');
 
-const { ERROR_DATA, ERROR_ID, ERROR_DEFAULT } = require('../utils/utils');
+const {
+  ERROR_DATA, ERROR_PARAM, ERROR_ID, ERROR_DEFAULT, JWT_SECRET,
+} = require('../utils/utils');
 
 const getUsers = (req, res) => {
   User.find({})
@@ -21,6 +24,28 @@ const getUserById = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError') return res.status(ERROR_DATA).send({ message: 'Что-то пошло не так' });
       return res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });
+    });
+};
+
+const login = (req, res) => {
+  const { email, password } = req.body;
+
+  User.findOne({ email })
+    .then((user) => {
+      compare(password, user.password)
+        .then((isMatched) => {
+          if (!isMatched) {
+            res.status(ERROR_PARAM).send({ message: 'Что-то пошло не так' });
+          }
+          const jwt = jsonwebtoken.sign({ _id: user._id }, JWT_SECRET, {
+            expiresIn: '7d',
+          });
+
+          res.status(200).send({ token: jwt });
+        });
+    })
+    .catch(() => {
+      res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });
     });
 };
 
@@ -79,6 +104,7 @@ const updateUserAvatar = (req, res) => {
 module.exports = {
   getUsers,
   getUserById,
+  login,
   createUser,
   updateUserInfo,
   updateUserAvatar,
