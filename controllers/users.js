@@ -1,3 +1,5 @@
+const { hash } = require('bcrypt');
+
 const User = require('../models/user');
 
 const { ERROR_DATA, ERROR_ID, ERROR_DEFAULT } = require('../utils/utils');
@@ -23,15 +25,22 @@ const getUserById = (req, res) => {
 };
 
 const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
 
-  User.create({ name, about, avatar })
-    .then((user) => {
-      if (user) res.status(201).send(user);
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-      return res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });
+  hash(password, 10)
+    .then((hashPassword) => {
+      User.create({
+        name, about, avatar, email, password: hashPassword,
+      })
+        .then((user) => {
+          if (user) res.status(201).send(user);
+        })
+        .catch((err) => {
+          if (err.name === 'ValidationError') return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+          return res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });
+        });
     });
 };
 
