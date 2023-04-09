@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 
 const routes = require('./routes');
+const auth = require('./middlewares/auth');
 
 const { PORT } = require('./utils/utils');
 
@@ -9,6 +10,8 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(auth);
 
 app.use((req, res, next) => {
   req.user = {
