@@ -27,10 +27,19 @@ const getUserById = (req, res) => {
     });
 };
 
+const getUserInfo = (req, res) => {
+  User.findById(req.user._id)
+    .then((user) => {
+      res.status(200).send(user);
+    })
+    .catch(() => {
+      res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });
+    });
+};
+
 const login = (req, res) => {
   const { email, password } = req.body;
-
-  User.findOne({ email })
+  User.findOne({ email }).select('+password')
     .then((user) => {
       compare(password, user.password)
         .then((isMatched) => {
@@ -60,12 +69,12 @@ const createUser = (req, res) => {
         name, about, avatar, email, password: hashPassword,
       })
         .then((user) => {
-          if (user) res.status(201).send(user);
-        })
-        .catch((err) => {
-          if (err.name === 'ValidationError') return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-          return res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });
+          if (user) res.status(201).send('Пользователь создан');
         });
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') return res.status(ERROR_DATA).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      return res.status(ERROR_DEFAULT).send({ message: 'Что-то пошло не так' });
     });
 };
 
@@ -104,6 +113,7 @@ const updateUserAvatar = (req, res) => {
 module.exports = {
   getUsers,
   getUserById,
+  getUserInfo,
   login,
   createUser,
   updateUserInfo,

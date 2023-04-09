@@ -1,6 +1,8 @@
 const Card = require('../models/card');
 
-const { ERROR_DATA, ERROR_ID, ERROR_DEFAULT } = require('../utils/utils');
+const {
+  ERROR_DATA, ERROR_PARAM, ERROR_ID, ERROR_DEFAULT,
+} = require('../utils/utils');
 
 const getCards = (req, res) => {
   Card.find({})
@@ -27,10 +29,16 @@ const createCard = (req, res) => {
 const deleteCard = (req, res) => {
   const { id } = req.params;
 
-  Card.findByIdAndDelete(id)
-    .then((card) => {
-      if (card) return res.status(200).send(card);
-      return res.status(ERROR_ID).send({ message: 'Карточка по ID не найдена' });
+  Card.findById(id)
+    .then((cardData) => {
+      if (!cardData) {
+        return res.status(ERROR_ID).send({ message: 'Карточка по ID не найдена' });
+      }
+      if (cardData.owner.toString() !== req.user._id) {
+        return res.status(ERROR_PARAM).send({ message: 'Вы не являетесь владельцем карточки' });
+      }
+      return Card.findByIdAndDelete(id)
+        .then((card) => res.status(200).send(card));
     })
     .catch((err) => {
       if (err.name === 'CastError') return res.status(ERROR_DATA).send({ message: 'Передан невалидный ID' });
