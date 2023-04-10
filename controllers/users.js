@@ -6,6 +6,7 @@ const User = require('../models/user');
 const SyntexError = require('../errors/syntex-err');
 const NotFoundError = require('../errors/not-found-err');
 const AuthError = require('../errors/auth-err');
+const AlreadyCreatedError = require('../errors/already-created-err');
 
 const { JWT_SECRET } = require('../utils/utils');
 
@@ -71,7 +72,10 @@ const createUser = (req, res, next) => {
           if (user) res.status(201).send('Пользователь создан');
         })
         .catch((err) => {
-          if (err.name === 'ValidationError' || err.name === 'MongoServerError') {
+          if (err.code === 11000) {
+            next(new AlreadyCreatedError('Пользователь с таким Email уже зарегистрирован'));
+          }
+          if (err.name === 'ValidationError') {
             next(new SyntexError('Переданы некорректные данные при создании пользователя.'));
           }
           next(err);

@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const { errors } = require('celebrate');
 
 const routes = require('./routes');
 
@@ -12,6 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(routes);
 
+app.use(errors());
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
 
