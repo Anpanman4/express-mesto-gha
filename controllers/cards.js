@@ -1,13 +1,13 @@
 const Card = require('../models/card');
 
 const SyntexError = require('../errors/syntex-err');
+const OwnerError = require('../errors/owner-err');
 const NotFoundError = require('../errors/not-found-err');
-const AuthError = require('../errors/auth-err');
 
 const getCards = (req, res, next) => {
   Card.find({})
     .populate(['owner', 'likes'])
-    .then((cards) => res.status(200).send(cards))
+    .then((cards) => res.send(cards))
     .catch(next);
 };
 
@@ -30,13 +30,13 @@ const deleteCard = (req, res, next) => {
   Card.findById(id)
     .then((cardData) => {
       if (!cardData) {
-        next(new NotFoundError('Карточка по ID не найдена'));
+        return next(new NotFoundError('Карточка по ID не найдена'));
       }
       if (cardData.owner.toString() !== req.user._id) {
-        next(new AuthError('Вы не являетесь владельцем карточки'));
+        return next(new OwnerError('Вы не являетесь владельцем карточки'));
       }
       return Card.findByIdAndDelete(id)
-        .then((card) => res.status(200).send(card))
+        .then((card) => res.send(card))
         .catch(next);
     })
     .catch((err) => {
@@ -52,7 +52,7 @@ const likeCard = (req, res, next) => {
     { new: true },
   )
     .then((card) => {
-      if (card) return res.status(200).send(card);
+      if (card) return res.send(card);
       return next(new NotFoundError('Карточка по ID не найдена'));
     })
     .catch((err) => {
@@ -68,7 +68,7 @@ const dislikeCard = (req, res, next) => {
     { new: true },
   )
     .then((card) => {
-      if (card) return res.status(200).send(card);
+      if (card) return res.send(card);
       return next(new NotFoundError('Карточка по ID не найдена'));
     })
     .catch((err) => {

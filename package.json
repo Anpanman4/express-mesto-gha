@@ -9,7 +9,7 @@
   "description": "project for study express and mongo.db",
   "main": "index.js",
   "scripts": {
-    "start": "PORT=3000 node app.js",
+    "start": "node app.js",
     "dev": "nodemon app.js",
     "lint": "npx eslint .",
     "lint:fix": "npm run lint -- --fix"
