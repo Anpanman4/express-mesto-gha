@@ -8,12 +8,17 @@ const userRoutes = require('./users');
 const cardRoutes = require('./cards');
 const { login, createUser } = require('../controllers/users');
 
-router.post('/signin', login);
+router.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+  }),
+}), login);
 router.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
     about: Joi.string().required().min(2).max(30),
-    avatar: Joi.string().required().pattern(/https?:\/\/(www\.)?[A-Za-z0-9.\-/]{1,}\.(ru|com)/),
+    avatar: Joi.string().required().pattern(/https?:\/\/(www\.)?[A-Za-z0-9.\-/]{1,}\.[a-z]{2,5}/),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),

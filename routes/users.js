@@ -20,7 +20,7 @@ router.patch('/me', celebrate({
 }), updateUserInfo);
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().pattern(/https?:\/\/(www\.)?[A-Za-z0-9.\-/]{1,}\.(ru|com)/),
+    avatar: Joi.string().pattern(/https?:\/\/(www\.)?[A-Za-z0-9.\-/]{1,}\.[a-z]{2,5}/),
   }),
 }), updateUserAvatar);
 

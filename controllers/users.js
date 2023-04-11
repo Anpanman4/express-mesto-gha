@@ -75,7 +75,7 @@ const createUser = (req, res, next) => {
         .then((user) => {
           if (user) {
             res.status(201).send({
-              user, about, avatar, email,
+              name, about, avatar, email,
             });
           }
         })
